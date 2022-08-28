@@ -22,12 +22,14 @@ module.exports.getUserById = (req, res) => {
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-
   User.create({ name, about, avatar })
     .then((newUser) => res.send({ newUser }))
     .catch((err) => {
-      if (err.name === 'ValidationError') { res.status(400).send({ message: 'Некорректные данные' }); }
-      return res.status(404).send({ message: 'Ошибка по-умолчанию' });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Некорректные данные' });
+      } else {
+        res.status(500).send({ message: 'Ошибка сервера' });
+      }
     });
 };
 
