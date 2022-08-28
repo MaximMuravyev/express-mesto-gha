@@ -1,5 +1,5 @@
 const Cards = require('../models/cards');
-const ErrorNotFound = require('../errors/ErrorNotFound');
+const InvalidDataError = require('../errors/InvalidDataError');
 const DefaultError = require('../errors/DefaultError');
 
 module.exports.getCard = (req, res) => {
@@ -14,7 +14,7 @@ module.exports.createCard = (req, res) => {
     .then((Card) => res.send({ Card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(InvalidDataError).send({ message: 'Некорректные данные' });
       } else {
         res.status(DefaultError).send({ message: 'Ошибка' });
       }
@@ -27,9 +27,9 @@ module.exports.deleteCard = (req, res) => {
     .then(() => res.send({ message: 'Удалено!' }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(InvalidDataError).send({ message: 'Некорректные данные' });
       } else if (err.message === 'Что-то пошло не так') {
-        res.status(ErrorNotFound).send({ message: 'Не удалось найти карточку' });
+        res.status(404).send({ message: 'Не удалось найти карточку' });
       } else {
         res.status(DefaultError).send({ message: 'Ошибка' });
       }
@@ -46,9 +46,9 @@ module.exports.likeCard = (req, res) => {
     .then((card) => res.send({ likes: card.likes }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(InvalidDataError).send({ message: 'Некорректные данные' });
       } else if (err.message === 'Что-то пошло не так') {
-        res.status(ErrorNotFound).send({ message: 'Не удалось найти карточку' });
+        res.status(404).send({ message: 'Не удалось найти карточку' });
       } else {
         res.status(DefaultError).send({ message: 'Ошибка' });
       }
@@ -65,9 +65,9 @@ module.exports.dislikeCard = (req, res) => {
     .then((card) => res.send({ likes: card.likes }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(InvalidDataError).send({ message: 'Некорректные данные' });
       } else if (err.message === 'Что-то пошло не так') {
-        res.status(ErrorNotFound).send({ message: 'Не удалось найти карточку' });
+        res.status(404).send({ message: 'Не удалось найти карточку' });
       } else {
         res.status(DefaultError).send({ message: 'Ошибка' });
       }
