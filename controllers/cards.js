@@ -1,9 +1,9 @@
 const Cards = require('../models/cards');
 
-module.exports.getCards = async (req, res) => {
-  await Cards.find({})
-    .then((cards) => res.send(cards))
-    .catch(() => res.status(500).send({ message: 'Ошибка по-умолчанию' }));
+module.exports.getCard = (req, res) => {
+  Cards.find({})
+    .then((cards) => res.send({ data: cards }))
+    .catch((err) => res.status(500).send({ message: 'Ошибка по-умолчанию', err }));
 };
 
 module.exports.createCard = (req, res) => {
