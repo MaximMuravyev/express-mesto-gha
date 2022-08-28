@@ -25,8 +25,8 @@ module.exports.deleteCardById = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Некорректные данные' });
-      } if (err.statusCode === 500) {
-        res.status(500).send({ message: 'Не удалось найти карточку' });
+      } if (err.statusCode === 404) {
+        res.status(404).send({ message: 'Не удалось найти карточку' });
       }
       return res.status(500).send({ message: 'Ошибка по-умолчанию' });
     });
@@ -43,8 +43,8 @@ module.exports.likeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Некорректные данные' });
-      } if (err.statusCode === 500) {
-        res.status(500).send({ message: 'Не удалось найти карточку' });
+      } if (err.statusCode === 404) {
+        res.status(404).send({ message: 'Не удалось найти карточку' });
       }
       return res.status(500).send({ message: 'Ошибка по-умолчанию' });
     });
@@ -61,8 +61,8 @@ module.exports.dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Некорректные данные' });
-      } if (err.statusCode === 500) {
-        res.status(500).send({ message: 'Не удалось найти карточку' });
+      } if (err.statusCode === 404) {
+        res.status(404).send({ message: 'Не удалось найти карточку' });
       }
       return res.status(500).send({ message: 'Ошибка по-умолчанию' });
     });
