@@ -18,14 +18,14 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Страница не найдена!' });
-});
-
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+mongoose.connect('mongodb://127.0.0.1:3000/mestodb');
 
 app.use('/', userRoutes);
 app.use('/', cardRoutes);
+
+app.use((req, res) => {
+  res.status(404).send({ message: 'Страница не найдена!' });
+});
 
 app.listen(PORT, (error) => {
   if (error) {
