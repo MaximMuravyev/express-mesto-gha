@@ -3,7 +3,7 @@ const Cards = require('../models/cards');
 module.exports.getCard = (req, res) => {
   Cards.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => res.status(500).send({ message: 'Ошибка по-умолчанию', err }));
+    .catch((err) => res.status(500).send({ message: 'Ошибка', err }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -14,7 +14,7 @@ module.exports.createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Некорректные данные' });
       } else {
-        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+        res.status(500).send({ message: 'Ошибка' });
       }
     });
 };
@@ -29,7 +29,7 @@ module.exports.deleteCard = (req, res) => {
       } else if (err.message === 'Что-то пошло не так') {
         res.status(404).send({ message: 'Не удалось найти карточку' });
       } else {
-        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+        res.status(500).send({ message: 'Ошибка' });
       }
     });
 };
@@ -48,7 +48,7 @@ module.exports.likeCard = (req, res) => {
       } else if (err.message === 'Что-то пошло не так') {
         res.status(404).send({ message: 'Не удалось найти карточку' });
       } else {
-        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+        res.status(500).send({ message: 'Ошибка' });
       }
     });
 };
@@ -67,7 +67,7 @@ module.exports.dislikeCard = (req, res) => {
       } else if (err.message === 'Что-то пошло не так') {
         res.status(404).send({ message: 'Не удалось найти карточку' });
       } else {
-        res.status(500).send({ message: 'Ошибка по-умолчанию' });
+        res.status(500).send({ message: 'Ошибка' });
       }
     });
 };
