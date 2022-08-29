@@ -4,6 +4,7 @@
     "no-underscore-dangle":
       ["error",{"allow":["_id"]}],
     "linebreak-style": 0,
-    "no-console": 0
+    "no-console": 0,
+    "object-shorthand": "off"
   }
 }
