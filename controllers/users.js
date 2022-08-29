@@ -1,9 +1,10 @@
 const User = require('../models/users');
+const { ErrorNotFound, InvalidDataError, DefaultError } = require('../errors/errors');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Ошибка' }));
+    .catch(() => res.status(DefaultError).send({ message: 'Ошибка' }));
 };
 
 module.exports.getUser = (req, res) => {
@@ -12,11 +13,11 @@ module.exports.getUser = (req, res) => {
     .then((user) => res.send({ user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный id' });
+        res.status(ErrorNotFound).send({ message: 'Некорректный id' });
       } else if (err.message === 'Что-то пошло не так') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(InvalidDataError).send({ message: 'Пользователь не найден' });
       }
-      return res.status(500).send({ message: 'Ошибка' });
+      return res.status(DefaultError).send({ message: 'Ошибка' });
     });
 };
 
@@ -27,9 +28,9 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
       } else {
-        res.status(500).send({ message: 'Ошибка' });
+        res.status(DefaultError).send({ message: 'Ошибка' });
       }
     });
 };
@@ -46,11 +47,11 @@ module.exports.updateUser = (req, res) => {
     .then((newData) => res.send({ newData }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
       } else if (err.message === 'Что-то пошло не так') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(InvalidDataError).send({ message: 'Пользователь не найден' });
       } else {
-        res.status(500).send({ message: 'Ошибка' });
+        res.status(DefaultError).send({ message: 'Ошибка' });
       }
     });
 };
@@ -67,11 +68,11 @@ module.exports.updateAvatar = (req, res) => {
     .then((newData) => res.send({ newData }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
       } else if (err.message === 'Что-то пошло не так') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(InvalidDataError).send({ message: 'Пользователь не найден' });
       } else {
-        res.status(500).send({ message: 'Ошибка' });
+        res.status(DefaultError).send({ message: 'Ошибка' });
       }
     });
 };

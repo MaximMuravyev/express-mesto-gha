@@ -1,9 +1,11 @@
 const Cards = require('../models/cards');
 
+const { ErrorNotFound, InvalidDataError, DefaultError } = require('../errors/errors');
+
 module.exports.getCard = (req, res) => {
   Cards.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => res.status(500).send({ message: 'Ошибка', err }));
+    .catch((err) => res.status(DefaultError).send({ message: 'Ошибка', err }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -12,9 +14,9 @@ module.exports.createCard = (req, res) => {
     .then((Card) => res.send({ Card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
       } else {
-        res.status(500).send({ message: 'Ошибка' });
+        res.status(DefaultError).send({ message: 'Ошибка' });
       }
     });
 };
@@ -25,11 +27,11 @@ module.exports.deleteCard = (req, res) => {
     .then(() => res.send({ message: 'Удалено!' }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
       } else if (err.message === 'Что-то пошло не так') {
-        res.status(404).send({ message: 'Не удалось найти карточку' });
+        res.status(InvalidDataError).send({ message: 'Не удалось найти карточку' });
       } else {
-        res.status(500).send({ message: 'Ошибка' });
+        res.status(DefaultError).send({ message: 'Ошибка' });
       }
     });
 };
@@ -44,11 +46,11 @@ module.exports.likeCard = (req, res) => {
     .then((card) => res.send({ likes: card.likes }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
       } else if (err.message === 'Что-то пошло не так') {
-        res.status(404).send({ message: 'Не удалось найти карточку' });
+        res.status(InvalidDataError).send({ message: 'Не удалось найти карточку' });
       } else {
-        res.status(500).send({ message: 'Ошибка' });
+        res.status(DefaultError).send({ message: 'Ошибка' });
       }
     });
 };
@@ -63,11 +65,11 @@ module.exports.dislikeCard = (req, res) => {
     .then((card) => res.send({ likes: card.likes }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
       } else if (err.message === 'Что-то пошло не так') {
-        res.status(404).send({ message: 'Не удалось найти карточку' });
+        res.status(InvalidDataError).send({ message: 'Не удалось найти карточку' });
       } else {
-        res.status(500).send({ message: 'Ошибка' });
+        res.status(DefaultError).send({ message: 'Ошибка' });
       }
     });
 };
