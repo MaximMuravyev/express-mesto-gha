@@ -24,7 +24,7 @@ module.exports.getUser = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else if (err.message === 'noDataFound') {
-        next(new ErrorNotFound('Пользователь с таким id не найден'));
+        next(new ErrorNotFound('Некорректный id'));
       } else {
         next({ message: 'Ошибка!' });
       }
@@ -37,7 +37,7 @@ module.exports.getMyUser = (req, res, next) => {
       if (user) {
         res.status(200).send({ data: user });
       } else {
-        next(new ErrorNotFound('Пользователь с таким id не найден'));
+        next(new ErrorNotFound('Некорректный id'));
       }
     })
     .catch((err) => {
@@ -56,24 +56,16 @@ module.exports.createUser = (req, res, next) => {
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
+      name, about, avatar, email, password: hash,
     }))
     .then((user) => res.status(200).send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-      _id: user._id,
+      name: user.name, about: user.about, avatar: user.avatar, email: user.email, _id: user._id,
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
       } else if (err.code === 11000) {
-        next(new RequestError('пользователь с таким email уже существует'));
+        next(new RequestError('Данный email уже используется'));
       } else {
         next({ message: 'Ошибка!' });
       }
@@ -91,16 +83,16 @@ module.exports.login = (req, res, next) => {
       );
       res
         .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
+          maxAge: 7 * 24 * 3600000,
         })
         .status(200)
-        .send({ message: 'Авторизация успешна' });
+        .send({ message: 'Успешно!' });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
       } else if (err.statusCode === 401) {
-        next(new AuthError('Некорректная почта или пароль'));
+        next(new AuthError('Некорректный пароль или email'));
       } else {
         next({ message: 'Ошибка!' });
       }

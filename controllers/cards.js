@@ -30,7 +30,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         next(new ErrorNotFound('Не найдено'));
       } else if (card.owner.toString() !== req.user._id) {
-        next(new ForbiddenError('Недостаточно прав'));
+        next(new ForbiddenError('Вы не можете это сделать'));
       }
       return card.delete();
     })
@@ -80,7 +80,7 @@ module.exports.dislikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new InvalidDataError('Невалидный id'));
+        next(new InvalidDataError('Некорректные данные'));
       } else {
         next({ message: 'Ошибка!' });
       }
