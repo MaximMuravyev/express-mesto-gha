@@ -6,8 +6,8 @@ const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getCard = (req, res, next) => {
   Cards.find({})
-    .then((cards) => res.send(cards))
-    .catch(() => next({ message: 'Произошла ошибка' }));
+    .then((cards) => res.status(200).send(cards))
+    .catch(() => next({ message: 'Ошибка!' }));
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -19,7 +19,7 @@ module.exports.createCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Произошла ошибка' });
+        next({ message: 'Ошибка!' });
       }
     });
 };
@@ -28,9 +28,9 @@ module.exports.deleteCard = (req, res, next) => {
   Cards.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        next(new ErrorNotFound('Карточка не найдена'));
+        next(new ErrorNotFound('Не найдено'));
       } else if (card.owner.toString() !== req.user._id) {
-        next(new ForbiddenError('Недостаточно прав'));
+        next(new ForbiddenError('Недоступно'));
       }
       return card.delete();
     })
@@ -39,7 +39,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Произошла ошибка' });
+        next({ message: 'Ошибка!' });
       }
     });
 };
@@ -52,7 +52,7 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        next(new ErrorNotFound('Карточка не найдена'));
+        next(new ErrorNotFound('Не найдено'));
       }
       res.send(card);
     })
@@ -60,7 +60,7 @@ module.exports.likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Произошла ошибка' });
+        next({ message: 'Ошибка!' });
       }
     });
 };
@@ -75,14 +75,14 @@ module.exports.dislikeCard = (req, res, next) => {
       if (card) {
         res.send(card);
       } else {
-        next(new ErrorNotFound('Карточка с таким id не найдена'));
+        next(new ErrorNotFound('Карточка не найдена'));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new InvalidDataError('Невалидный id'));
+        next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Произошла ошибка' });
+        next({ message: 'Ошибка!' });
       }
     });
 };
