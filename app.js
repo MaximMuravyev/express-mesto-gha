@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+const cookieParser = require('cookie-parser');
 const cardRouter = require('./routes/cards');
 const userRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
@@ -17,7 +18,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use('/', authRouter);
-
+app.use(cookieParser());
 app.use(auth);
 
 app.use('/', userRouter);
