@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     validate: (v) => urlType.test(v),
   },
-});
+}, { versionKey: false });
 
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password') // this в данном случае - User

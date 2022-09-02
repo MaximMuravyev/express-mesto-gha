@@ -19,8 +19,8 @@ app.use('/', authRoutes);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', errorRoutes);
-app.use('/', userRouter, auth);
-app.use('/', cardRouter, auth);
+app.use('/users', auth, userRouter);
+app.use('/cards', auth, cardRouter);
 
 app.use(errors());
 app.use(errorHandler);
