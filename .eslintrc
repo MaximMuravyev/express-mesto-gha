@@ -9,6 +9,7 @@
         ]
       }
     ],
+    "object-shorthand": "off",
     "linebreak-style": 0
   }
 }

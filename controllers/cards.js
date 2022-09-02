@@ -4,21 +4,22 @@ const InvalidDataError = require('../errors/InvalidDataError');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const ForbiddenError = require('../errors/DefaultError');
 
-module.exports.getCard = async (req, res, next) => {
-  await Cards.find({})
+module.exports.getCards = (req, res, next) => {
+  Cards.find({})
     .then((cards) => res.send(cards))
-    .catch(next);
+    .catch(() => next({ message: 'Произошла ошибка' }));
 };
 
-module.exports.createCard = (req, res, next) => {
+module.exports.createCards = (req, res, next) => {
   const { name, link } = req.body;
-  Cards.create({ name, link, owner: req.user._id })
+  const owner = req.user;
+  Cards.create({ name, link, owner })
     .then((Card) => res.send({ Card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next(err);
+        next({ message: 'Произошла ошибка' });
       }
     });
 };
@@ -27,18 +28,21 @@ module.exports.deleteCard = (req, res, next) => {
   Cards.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new ErrorNotFound('Карточка не найдена'); // проверяем её существование
-      } else if (card.owner.toString() !== req.user._id) {
-        throw new ForbiddenError('Нет доступа'); // проверяем, является ли текущий пользователь владельцем карточки
+        next(new ErrorNotFound('Карточка не найдена'));
+      } else if (card.owner.toString() === req.user) {
+        Cards.findByIdAndDelete(req.params.cardId)
+          .then(() => {
+            res.send(card);
+          });
+      } else {
+        next(new ForbiddenError('Недостаточно прав'));
       }
-      return card.delete(); // в случае успеха удаляем карточку
     })
-    .then(() => res.send({ message: 'Удалено' }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next(err);
+        next({ message: 'Произошла ошибка' });
       }
     });
 };
@@ -51,15 +55,15 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new ErrorNotFound('Карточка не найдена');
+        next(new ErrorNotFound('Карточка не найдена'));
       }
-      res.send({ likes: card.likes });
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next(err);
+        next({ message: 'Произошла ошибка' });
       }
     });
 };
@@ -72,15 +76,15 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new ErrorNotFound('Карточка не найдена');
+        next(new ErrorNotFound('Карточка не найдена'));
       }
-      res.send({ likes: card.likes });
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next(err);
+        next({ message: 'Произошла ошибка' });
       }
     });
 };

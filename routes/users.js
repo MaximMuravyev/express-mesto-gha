@@ -1,42 +1,31 @@
 const router = require('express').Router();
-const { celebrate, Joi, Segments } = require('celebrate');
+const { celebrate, Joi } = require('celebrate');
 
-const urlPattern = require('../utils/url-type');
+const { urlValid } = require('../utils/url-type');
 const {
-  getUsers, getUser, updateUser, updateAvatar,
+  getAllUsers, getByIdUser, getMyUser, updateProfile, updateAvatar,
 } = require('../controllers/users');
 
-router.get('/', getUsers);
-router.get('/me', getUser);
+router.get('/users', getAllUsers);
 
-router.get('/:userId', celebrate({
-  [Segments.PARAMS]: Joi.object().keys({
-    userId: Joi.string()
-      .hex()
-      .length(24)
-      .messages({
-        'string.length': 'Incorrect id',
-        'string.hex': 'Incorrect id',
-      }), // кастомные сообщения об ошибках
+router.get('/users/me', getMyUser);
+
+router.get('/users/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().hex().length(24),
   }),
-}), getUser);
+}), getByIdUser);
 
-router.patch('/me', celebrate({
-  [Segments.BODY]: Joi.object().keys({
-    name: Joi.string()
-      .min(2)
-      .max(30),
-    about: Joi.string()
-      .min(2)
-      .max(30),
+router.patch('/users/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
   }),
-}), updateUser);
+}), updateProfile);
 
-router.patch('/me/avatar', celebrate({
-  [Segments.BODY]: Joi.object().keys({
-    avatar: Joi.string()
-      .pattern(urlPattern) // регулярное выражение для ссылки
-      .messages({ 'string.pattern.base': 'Invalid URL' }), // замена дефолтного сообщения для ошибки string.pattern.base - ошибка паттерна
+router.patch('/users/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().custom(urlValid),
   }),
 }), updateAvatar);
 

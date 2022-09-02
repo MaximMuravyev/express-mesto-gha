@@ -1,4 +1,3 @@
-const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -7,27 +6,45 @@ const User = require('../models/users');
 const InvalidDataError = require('../errors/InvalidDataError');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const RequestError = require('../errors/RequestError');
+const AuthError = require('../errors/AuthError');
 
-module.exports.getUsers = async (req, res, next) => {
-  await User.find({})
+module.exports.getAllUsers = (req, res, next) => {
+  User.find({})
     .then((users) => res.send(users))
-    .catch(next);
+    .catch(() => next({ message: 'Произошла ошибка' }));
 };
 
-module.exports.getUser = (req, res, next) => {
-  const id = (req.params.userId === undefined ? req.user._id : req.params.userId);
-  User.findById(id)
+module.exports.getByIdUser = (req, res, next) => {
+  User.findById(req.params.userId)
+    .orFail(new Error('noDataFound'))
     .then((user) => {
-      if (!user) {
-        throw new ErrorNotFound('Нет пользователя с таким id');
-      }
-      res.send({ user });
+      res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') { // распознаём ошибку и возвращаем с нужным кодом
-        next(new InvalidDataError('Некорректные данные'));
+      if (err.name === 'CastError') {
+        next(new InvalidDataError('Невалидный id'));
+      } else if (err.message === 'noDataFound') {
+        next(new ErrorNotFound('Пользователь с таким id не найден'));
       } else {
-        next(err);
+        next({ message: 'Произошла ошибка' });
+      }
+    });
+};
+
+module.exports.getMyUser = (req, res, next) => {
+  User.findById(req.user)
+    .then((user) => {
+      if (user) {
+        res.send({ data: user });
+      } else {
+        next(new ErrorNotFound('Пользователь с таким id не найден'));
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new InvalidDataError('Невалидный id'));
+      } else {
+        next({ message: 'Произошла ошибка' });
       }
     });
 };
@@ -37,88 +54,90 @@ module.exports.createUser = (req, res, next) => {
     email, password, name, about, avatar,
   } = req.body;
 
-  if (!validator.isEmail(email)) {
-    next(new InvalidDataError('Некорректные данные')); // валидируем email
-  } else {
-    bcrypt.hash(password, 10) // в случае успеха хэшируем пароль и создаём пользователя
-      .then((hash) => User.create({
-        email, password: hash, name, about, avatar,
-      })
-        .then((newUser) => {
-        // eslint-disable-next-line no-shadow
-          const { password, ...response } = newUser._id;
-          res.send({ response });
-        })
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            next(new InvalidDataError('Некорректные данные'));
-          } else if (err.code === 11000) {
-            next(new RequestError('Email уже зарегистрирован'));
-          } else {
-            next(err);
-          }
-        }));
-  }
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((user) => res.send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
+    }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new InvalidDataError('Некорректные данные'));
+      } else if (err.code === 11000) {
+        next(new RequestError('пользователь с таким email уже существует'));
+      } else {
+        next({ message: 'Произошла ошибка' });
+      }
+    });
 };
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  // используем кастомный метод для проверки логина и пароля
-  return User.findUserByCredentials(email, password)
+  User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
         'this-is-my-secret-key',
-        { expiresIn: '7d' }, // создали JWT-токен сроком на неделю
       );
-      res.send({ token });
-    })
-    .catch(next);
-};
-
-module.exports.updateUser = (req, res, next) => {
-  const { name, about } = req.body;
-
-  User.findByIdAndUpdate(
-    req.user._id,
-    { name, about },
-    { new: true, runValidators: true },
-  )
-    .then((updUser) => {
-      if (!updUser) {
-        throw new ErrorNotFound('Нет пользователя с таким id');
-      }
-      res.send({ updUser });
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+        })
+        .send({ message: 'Авторизация успешна' });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
+      } else if (err.statusCode === 401) {
+        next(new AuthError('Неправильные почта или пароль'));
       } else {
-        next(err);
+        next({ message: 'Произошла ошибка' });
+      }
+    });
+};
+
+module.exports.updateProfile = (req, res, next) => {
+  const { name, about } = req.body;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name: name, about: about },
+    { new: true, runValidators: true },
+  )
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new InvalidDataError('Некорректные данные'));
+      } else {
+        next({ message: 'Произошла ошибка' });
       }
     });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
-  const newAvatar = req.body.avatar;
+  const { avatar } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
-    { avatar: newAvatar },
-    { new: true },
+    { avatar: avatar },
+    { new: true, runValidators: true },
   )
-    .then((updUser) => {
-      if (!updUser) {
-        throw new ErrorNotFound('Нет пользователя с таким id');
-      }
-      res.send({ updUser });
-    })
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next(err);
+        next({ message: 'Произошла ошибка' });
       }
     });
 };
