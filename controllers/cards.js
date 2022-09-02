@@ -75,14 +75,15 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true },
   )
     .then((card) => {
-      if (!card) {
-        next(new ErrorNotFound('Карточка не найдена'));
+      if (card) {
+        res.send(card);
+      } else {
+        next(new ErrorNotFound('Карточка с таким id не найдена'));
       }
-      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new InvalidDataError('Некорректные данные'));
+        next(new InvalidDataError('Невалидный id'));
       } else {
         next({ message: 'Произошла ошибка' });
       }
