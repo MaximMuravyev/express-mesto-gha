@@ -2,33 +2,28 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-
 const cardRouter = require('./routes/cards');
 const userRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
-
+const ErrorNotFound = require('./errors/ErrorNotFound');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error-handler');
 
-const ErrorNotFound = require('./errors/ErrorNotFound');
-
 const { PORT = 3000 } = process.env;
+mongoose.connect('mongodb://localhost:27017/mestodb');
 
 const app = express();
+
+app.use(auth);
 
 app.use(bodyParser.json());
 
 app.use('/', authRouter);
-
-app.use(auth);
-
-app.use('/', userRouter);
 app.use('/', cardRouter);
+app.use('/', userRouter);
 
 app.use((req, res, next) => next(new ErrorNotFound('Неправильный маршрут')));
 app.use(errors());
 app.use(errorHandler);
-
-mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.listen(PORT);
