@@ -44,10 +44,9 @@ module.exports.createUser = (req, res, next) => {
       .then((hash) => User.create({
         email, password: hash, name, about, avatar,
       })
-        .then((newUser) => {
-          // eslint-disable-next-line no-shadow
-          const { password, ...response } = newUser._doc;
-          res.send({ response });
+        .then((user) => User.findOne({ _id: user._id })) // прячет пароль
+        .then((user) => {
+          res.status(200).send(user);
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
@@ -122,4 +121,3 @@ module.exports.updateAvatar = (req, res, next) => {
       }
     });
 };
-
