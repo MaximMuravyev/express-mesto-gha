@@ -1,75 +1,86 @@
 const Cards = require('../models/cards');
 
-const { ErrorNotFound, InvalidDataError, DefaultError } = require('../errors/errors');
+const InvalidDataError = require('../errors/InvalidDataError');
+const ErrorNotFound = require('../errors/ErrorNotFound');
+const ForbiddenError = require('../errors/DefaultError');
 
-module.exports.getCard = (req, res) => {
-  Cards.find({})
-    .then((cards) => res.send({ data: cards }))
-    .catch((err) => res.status(DefaultError).send({ message: 'Ошибка', err }));
+module.exports.getCard = async (req, res, next) => {
+  await Cards.find({})
+    .then((cards) => res.send(cards))
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Cards.create({ name, link, owner: req.user._id })
     .then((Card) => res.send({ Card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
+        next(new ErrorNotFound('Некорректные данные'));
       } else {
-        res.status(DefaultError).send({ message: 'Ошибка' });
+        next(err);
       }
     });
 };
 
-module.exports.deleteCard = (req, res) => {
-  Cards.findByIdAndDelete(req.params.cardId)
-    .orFail(new Error('Что-то пошло не так'))
-    .then(() => res.send({ message: 'Удалено!' }))
+module.exports.deleteCard = (req, res, next) => {
+  Cards.findById(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        throw new InvalidDataError('Карточка не найдена'); // проверяем её существование
+      } else if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Нет доступа'); // проверяем, является ли текущий пользователь владельцем карточки
+      }
+      return card.delete(); // в случае успеха удаляем карточку
+    })
+    .then(() => res.send({ message: 'Удалено' }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
-      } else if (err.message === 'Что-то пошло не так') {
-        res.status(InvalidDataError).send({ message: 'Не удалось найти карточку' });
+        next(new ErrorNotFound('Некорректные данные'));
       } else {
-        res.status(DefaultError).send({ message: 'Ошибка' });
+        next(err);
       }
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Cards.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new Error('Что-то пошло не так'))
-    .then((card) => res.send({ likes: card.likes }))
+    .then((card) => {
+      if (!card) {
+        throw new InvalidDataError('Карточка не найдена');
+      }
+      res.send({ likes: card.likes });
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
-      } else if (err.message === 'Что-то пошло не так') {
-        res.status(InvalidDataError).send({ message: 'Не удалось найти карточку' });
+        next(new ErrorNotFound('Некорректные данные'));
       } else {
-        res.status(DefaultError).send({ message: 'Ошибка' });
+        next(err);
       }
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Cards.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new Error('Что-то пошло не так'))
-    .then((card) => res.send({ likes: card.likes }))
+    .then((card) => {
+      if (!card) {
+        throw new InvalidDataError('Карточка не найдена');
+      }
+      res.send({ likes: card.likes });
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ErrorNotFound).send({ message: 'Некорректные данные' });
-      } else if (err.message === 'Что-то пошло не так') {
-        res.status(InvalidDataError).send({ message: 'Не удалось найти карточку' });
+        next(new ErrorNotFound('Некорректные данные'));
       } else {
-        res.status(DefaultError).send({ message: 'Ошибка' });
+        next(err);
       }
     });
 };
