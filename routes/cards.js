@@ -3,10 +3,10 @@ const { celebrate, Joi, Segments } = require('celebrate');
 
 const urlPattern = require('../utils/url-type');
 const {
-  getCards, createCard, deleteCardById, likeCard, dislikeCard,
+  getCard, createCard, deleteCard, likeCard, dislikeCard,
 } = require('../controllers/cards');
 
-router.get('/', getCards);
+router.get('/', getCard);
 
 router.post('/', celebrate({
   [Segments.BODY]: Joi.object().keys({
@@ -32,7 +32,7 @@ router.delete('/:cardId', celebrate({
         'string.hex': 'Incorrect id',
       }), // кастомные сообщения об ошибках
   }),
-}), deleteCardById);
+}), deleteCard);
 
 router.put('/:cardId/likes', celebrate({
   [Segments.PARAMS]: Joi.object().keys({

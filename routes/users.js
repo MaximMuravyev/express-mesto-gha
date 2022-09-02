@@ -3,11 +3,11 @@ const { celebrate, Joi, Segments } = require('celebrate');
 
 const urlPattern = require('../utils/url-type');
 const {
-  getUsers, getUserById, updateUser, updateAvatar,
+  getUsers, getUser, updateUser, updateAvatar,
 } = require('../controllers/users');
 
 router.get('/', getUsers);
-router.get('/me', getUserById);
+router.get('/me', getUser);
 
 router.get('/:userId', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
@@ -19,7 +19,7 @@ router.get('/:userId', celebrate({
         'string.hex': 'Incorrect id',
       }), // кастомные сообщения об ошибках
   }),
-}), getUserById);
+}), getUser);
 
 router.patch('/me', celebrate({
   [Segments.BODY]: Joi.object().keys({
