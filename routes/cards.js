@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 
 const { urlValid } = require('../utils/url-type');
+
 const {
   getCards, createCards, deleteCard, likeCard, dislikeCard,
 } = require('../controllers/cards');
