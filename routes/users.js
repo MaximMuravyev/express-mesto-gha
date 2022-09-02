@@ -6,13 +6,13 @@ const { urlCorrect } = require('../config/url-config');
 const {
   getUsers,
   getUser,
-  getMyUser,
+  getUserMe,
   updateUser,
   updateAvatar,
 } = require('../controllers/users');
 
 router.get('/users', getUsers);
-router.get('/users/me', getMyUser);
+router.get('/users/me', getUserMe);
 
 router.get('/users/:userId', celebrate({
   params: Joi.object().keys({

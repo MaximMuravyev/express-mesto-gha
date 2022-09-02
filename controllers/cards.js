@@ -1,8 +1,7 @@
-const Cards = require('../models/card');
-
 const InvalidDataError = require('../errors/InvalidDataError');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const ForbiddenError = require('../errors/ForbiddenError');
+const Cards = require('../models/card');
 
 module.exports.getCard = (req, res, next) => {
   Cards.find({})
@@ -52,7 +51,7 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        next(new ErrorNotFound('Не найдено'));
+        next(new ErrorNotFound('Карточка не найдена'));
       }
       res.status(200).send(card);
     })
@@ -66,11 +65,7 @@ module.exports.likeCard = (req, res, next) => {
 };
 
 module.exports.dislikeCard = (req, res, next) => {
-  Cards.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true },
-  )
+  Cards.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (card) {
         res.status(200).send(card);

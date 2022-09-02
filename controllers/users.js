@@ -1,12 +1,11 @@
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-const User = require('../models/users');
+const bcrypt = require('bcryptjs');
 
 const InvalidDataError = require('../errors/InvalidDataError');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const RequestError = require('../errors/RequestError');
 const AuthError = require('../errors/AuthError');
+const User = require('../models/users');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -16,14 +15,14 @@ module.exports.getUsers = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(new Error('noDataFound'))
+    .orFail(new Error('Не найдено'))
     .then((user) => {
       res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
-      } else if (err.message === 'noDataFound') {
+      } else if (err.message === 'Не найдено') {
         next(new ErrorNotFound('Некорректный id'));
       } else {
         next({ message: 'Ошибка!' });
@@ -53,7 +52,6 @@ module.exports.createUser = (req, res, next) => {
   const {
     email, password, name, about, avatar,
   } = req.body;
-
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
@@ -82,9 +80,7 @@ module.exports.login = (req, res, next) => {
         'this-is-my-secret-key',
       );
       res
-        .cookie('jwt', token, {
-          maxAge: 7 * 24 * 3600000,
-        })
+        .cookie('jwt', token, { maxAge: 7 * 24 * 3600000 })
         .status(200)
         .send({ message: 'Успешно!' });
     })
@@ -101,7 +97,6 @@ module.exports.login = (req, res, next) => {
 
 module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
-
   User.findByIdAndUpdate(
     req.user._id,
     { name: name, about: about },
@@ -119,7 +114,6 @@ module.exports.updateUser = (req, res, next) => {
 
 module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-
   User.findByIdAndUpdate(
     req.user._id,
     { avatar: avatar },
