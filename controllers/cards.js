@@ -30,14 +30,11 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         next(new ErrorNotFound('Карточка не найдена'));
       } else if (card.owner.toString() !== req.user._id) {
-        Cards.findByIdAndDelete(req.params.cardId)
-          .then(() => {
-            res.send(card);
-          });
-      } else {
         next(new ForbiddenError('Недостаточно прав'));
       }
+      return card.delete();
     })
+    .then(() => res.send({ message: 'Удалено' }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
