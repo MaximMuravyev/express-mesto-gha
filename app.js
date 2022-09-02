@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 
@@ -21,7 +20,6 @@ app.use(bodyParser.json());
 
 app.use('/', authRouter);
 
-app.use(cookieParser());
 app.use(auth);
 
 app.use('/', userRouter);
