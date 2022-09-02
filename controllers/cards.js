@@ -2,7 +2,7 @@ const Cards = require('../models/card');
 
 const InvalidDataError = require('../errors/InvalidDataError');
 const ErrorNotFound = require('../errors/ErrorNotFound');
-const ForbiddenError = require('../errors/DefaultError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Cards.find({})

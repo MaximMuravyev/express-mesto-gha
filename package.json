@@ -15,6 +15,10 @@
   },
   "author": "Maxim Muravyev",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MaximMuravyev/express-mesto-gha/issues"
+  },
+  "homepage": "https://github.com/MaximMuravyev/express-mesto-gha#readme",
   "devDependencies": {
     "eslint": "^8.21.0",
     "eslint-config-airbnb-base": "^15.0.0",

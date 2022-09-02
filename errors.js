@@ -1,11 +1,13 @@
 const InvalidDataError = 400;
 const AuthError = 401;
 const ErrorNotFound = 404;
-const DefaultError = 500;
+const ForbiddenError = 403;
+const RequestError = 409;
 
 module.exports = {
   ErrorNotFound,
   AuthError,
   InvalidDataError,
-  DefaultError,
+  ForbiddenError,
+  RequestError,
 };
