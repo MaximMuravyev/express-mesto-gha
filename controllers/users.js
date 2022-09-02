@@ -30,7 +30,7 @@ module.exports.getUser = (req, res, next) => {
     });
 };
 
-module.exports.getMyUser = (req, res, next) => {
+module.exports.getUserMe = (req, res, next) => {
   User.findById(req.user)
     .then((user) => {
       if (user) {

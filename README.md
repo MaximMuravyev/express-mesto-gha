@@ -1,8 +1,8 @@
 [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
 # Проект Mesto фронтенд + бэкенд
 
-## Выполнена проектная работа №13
-* Настроена бэкенд часть приложения Mesto;
+## Выполнена проектная работа №14
+* Окончательно настроена бэкенд часть приложения Mesto;
 * Проект успешно проходит автотесты на GitHub
 
 ## Настройка бейджей статуса тестов
