@@ -6,7 +6,7 @@ const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getCard = (req, res, next) => {
   Cards.find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => res.send(cards))
     .catch(() => next({ message: 'Ошибка!' }));
 };
 
@@ -30,7 +30,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         next(new ErrorNotFound('Не найдено'));
       } else if (card.owner.toString() !== req.user._id) {
-        next(new ForbiddenError('Недоступно'));
+        next(new ForbiddenError('Недостаточно прав'));
       }
       return card.delete();
     })
@@ -80,7 +80,7 @@ module.exports.dislikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new InvalidDataError('Некорректные данные'));
+        next(new InvalidDataError('Невалидный id'));
       } else {
         next({ message: 'Ошибка!' });
       }

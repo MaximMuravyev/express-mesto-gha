@@ -10,7 +10,7 @@ const AuthError = require('../errors/AuthError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.send(users))
     .catch(() => next({ message: 'Ошибка!' }));
 };
 
@@ -24,7 +24,7 @@ module.exports.getUser = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else if (err.message === 'noDataFound') {
-        next(new ErrorNotFound('Пользователь с таким id не существует'));
+        next(new ErrorNotFound('Пользователь с таким id не найден'));
       } else {
         next({ message: 'Ошибка!' });
       }
@@ -37,7 +37,7 @@ module.exports.getMyUser = (req, res, next) => {
       if (user) {
         res.send({ data: user });
       } else {
-        next(new ErrorNotFound('Пользователь с таким id не существует'));
+        next(new ErrorNotFound('Пользователь с таким id не найден'));
       }
     })
     .catch((err) => {
@@ -88,15 +88,18 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign(
         { _id: user._id },
         'this-is-my-secret-key',
-        { expiresIn: '7d' },
       );
-      res.send({ token });
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+        })
+        .send({ message: 'Авторизация успешна' });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
       } else if (err.statusCode === 401) {
-        next(new AuthError('Некорректный пароль или email'));
+        next(new AuthError('Некорректная почта или пароль'));
       } else {
         next({ message: 'Ошибка!' });
       }
