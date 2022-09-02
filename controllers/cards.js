@@ -6,7 +6,7 @@ const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getCard = (req, res, next) => {
   Cards.find({})
-    .then((cards) => res.send(cards))
+    .then((cards) => res.status(200).send(cards))
     .catch(() => next({ message: 'Ошибка!' }));
 };
 
@@ -14,7 +14,7 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user;
   Cards.create({ name, link, owner })
-    .then((card) => res.send(card))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
@@ -34,7 +34,7 @@ module.exports.deleteCard = (req, res, next) => {
       }
       return card.delete();
     })
-    .then(() => res.send({ message: 'Удалено' }))
+    .then(() => res.status(200).send({ message: 'Удалено' }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
@@ -54,7 +54,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!card) {
         next(new ErrorNotFound('Не найдено'));
       }
-      res.send(card);
+      res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -73,7 +73,7 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (card) {
-        res.send(card);
+        res.status(200).send(card);
       } else {
         next(new ErrorNotFound('Карточка не найдена'));
       }

@@ -10,7 +10,7 @@ const AuthError = require('../errors/AuthError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send(users))
+    .then((users) => res.status(200).send(users))
     .catch(() => next({ message: 'Ошибка!' }));
 };
 
@@ -18,7 +18,7 @@ module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(new Error('noDataFound'))
     .then((user) => {
-      res.send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -35,7 +35,7 @@ module.exports.getMyUser = (req, res, next) => {
   User.findById(req.user)
     .then((user) => {
       if (user) {
-        res.send({ data: user });
+        res.status(200).send({ data: user });
       } else {
         next(new ErrorNotFound('Пользователь с таким id не найден'));
       }
@@ -62,7 +62,7 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.send({
+    .then((user) => res.status(200).send({
       name: user.name,
       about: user.about,
       avatar: user.avatar,
@@ -93,6 +93,7 @@ module.exports.login = (req, res, next) => {
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
         })
+        .status(200)
         .send({ message: 'Авторизация успешна' });
     })
     .catch((err) => {
@@ -114,7 +115,7 @@ module.exports.updateUser = (req, res, next) => {
     { name: name, about: about },
     { new: true, runValidators: true },
   )
-    .then((user) => res.send(user))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
@@ -132,7 +133,7 @@ module.exports.updateAvatar = (req, res, next) => {
     { avatar: avatar },
     { new: true, runValidators: true },
   )
-    .then((user) => res.send(user))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
