@@ -10,13 +10,13 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   password: {
-    default: 'Жак-Ив Кусто',
     type: String,
     required: true,
     select: false,
     minlength: 8,
   },
   name: {
+    default: 'Жак-Ив Кусто',
     type: String,
     minlength: 2,
     maxlength: 30,
