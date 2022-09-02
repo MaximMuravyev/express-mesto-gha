@@ -44,9 +44,10 @@ module.exports.createUser = (req, res, next) => {
       .then((hash) => User.create({
         email, password: hash, name, about, avatar,
       })
-        .then((user) => User.findOne({ _id: user._id })) // прячет пароль
-        .then((user) => {
-          res.status(200).send(user);
+        .then((newUser) => {
+        // eslint-disable-next-line no-shadow
+          const { password, ...response } = newUser._id;
+          res.send({ response });
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
