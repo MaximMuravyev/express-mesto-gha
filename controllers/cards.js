@@ -1,4 +1,4 @@
-const Cards = require('../models/cards');
+const Cards = require('../models/card');
 
 const InvalidDataError = require('../errors/InvalidDataError');
 const ErrorNotFound = require('../errors/ErrorNotFound');
