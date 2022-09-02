@@ -4,26 +4,26 @@ const { celebrate, Joi } = require('celebrate');
 const { urlCorrect } = require('../config/url-config');
 
 const {
-  getCards,
-  createCards,
+  getCard,
+  createCard,
   deleteCard,
   likeCard,
   dislikeCard,
 } = require('../controllers/cards');
 
-router.get('/cards', getCards);
+router.get('/cards', getCard);
 
 router.post('/cards', celebrate({
   body: Joi.object().keys({
     name: Joi.string()
-      .required()
       .min(2)
-      .max(30),
+      .max(30)
+      .required(),
     link: Joi.string()
-      .required()
-      .custom(urlCorrect),
+      .custom(urlCorrect)
+      .required(),
   }),
-}), createCards);
+}), createCard);
 
 router.delete('/cards/:cardId', celebrate({
   params: Joi.object().keys({

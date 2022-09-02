@@ -4,14 +4,14 @@ const { celebrate, Joi } = require('celebrate');
 const { urlCorrect } = require('../config/url-config');
 
 const {
-  getAllUsers,
-  getByIdUser,
+  getUsers,
+  getUser,
   getMyUser,
-  updateProfile,
+  updateUser,
   updateAvatar,
 } = require('../controllers/users');
 
-router.get('/users', getAllUsers);
+router.get('/users', getUsers);
 router.get('/users/me', getMyUser);
 
 router.get('/users/:userId', celebrate({
@@ -21,7 +21,7 @@ router.get('/users/:userId', celebrate({
       .length(24)
       .required(),
   }),
-}), getByIdUser);
+}), getUser);
 
 router.patch('/users/me', celebrate({
   body: Joi.object().keys({
@@ -34,7 +34,7 @@ router.patch('/users/me', celebrate({
       .max(30)
       .required(),
   }),
-}), updateProfile);
+}), updateUser);
 
 router.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({

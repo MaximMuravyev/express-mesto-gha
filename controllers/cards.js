@@ -4,13 +4,13 @@ const InvalidDataError = require('../errors/InvalidDataError');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const ForbiddenError = require('../errors/ForbiddenError');
 
-module.exports.getCards = (req, res, next) => {
+module.exports.getCard = (req, res, next) => {
   Cards.find({})
     .then((cards) => res.send(cards))
     .catch(() => next({ message: 'Произошла ошибка' }));
 };
 
-module.exports.createCards = (req, res, next) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user;
   Cards.create({ name, link, owner })

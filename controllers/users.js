@@ -8,13 +8,13 @@ const ErrorNotFound = require('../errors/ErrorNotFound');
 const RequestError = require('../errors/RequestError');
 const AuthError = require('../errors/AuthError');
 
-module.exports.getAllUsers = (req, res, next) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(() => next({ message: 'Произошла ошибка' }));
 };
 
-module.exports.getByIdUser = (req, res, next) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(new Error('noDataFound'))
     .then((user) => {
@@ -106,7 +106,7 @@ module.exports.login = (req, res, next) => {
     });
 };
 
-module.exports.updateProfile = (req, res, next) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
