@@ -19,13 +19,13 @@ module.exports.getUser = (req, res, next) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        throw new InvalidDataError('Нет пользователя с таким id');
+        throw new ErrorNotFound('Нет пользователя с таким id');
       }
       res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'CastError') { // распознаём ошибку и возвращаем с нужным кодом
-        next(new ErrorNotFound('Некорректные данные'));
+        next(new InvalidDataError('Некорректные данные'));
       } else {
         next(err);
       }
@@ -38,7 +38,7 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
 
   if (!validator.isEmail(email)) {
-    next(new ErrorNotFound('Некорректные данные')); // валидируем email
+    next(new InvalidDataError('Некорректные данные')); // валидируем email
   } else {
     bcrypt.hash(password, 10) // в случае успеха хэшируем пароль и создаём пользователя
       .then((hash) => User.create({
@@ -51,7 +51,7 @@ module.exports.createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            next(new ErrorNotFound('Некорректные данные'));
+            next(new InvalidDataError('Некорректные данные'));
           } else if (err.code === 11000) {
             next(new RequestError('Email уже зарегистрирован'));
           } else {
@@ -87,13 +87,13 @@ module.exports.updateUser = (req, res, next) => {
   )
     .then((updUser) => {
       if (!updUser) {
-        throw new InvalidDataError('Нет пользователя с таким id');
+        throw new ErrorNotFound('Нет пользователя с таким id');
       }
       res.send({ updUser });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ErrorNotFound('Некорректные данные'));
+        next(new InvalidDataError('Некорректные данные'));
       } else {
         next(err);
       }
@@ -110,13 +110,13 @@ module.exports.updateAvatar = (req, res, next) => {
   )
     .then((updUser) => {
       if (!updUser) {
-        throw new InvalidDataError('Нет пользователя с таким id');
+        throw new ErrorNotFound('Нет пользователя с таким id');
       }
       res.send({ updUser });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ErrorNotFound('Некорректные данные'));
+        next(new InvalidDataError('Некорректные данные'));
       } else {
         next(err);
       }

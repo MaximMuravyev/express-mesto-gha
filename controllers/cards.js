@@ -16,7 +16,7 @@ module.exports.createCard = (req, res, next) => {
     .then((Card) => res.send({ Card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ErrorNotFound('Некорректные данные'));
+        next(new InvalidDataError('Некорректные данные'));
       } else {
         next(err);
       }
@@ -27,7 +27,7 @@ module.exports.deleteCard = (req, res, next) => {
   Cards.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new InvalidDataError('Карточка не найдена'); // проверяем её существование
+        throw new ErrorNotFound('Карточка не найдена'); // проверяем её существование
       } else if (card.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Нет доступа'); // проверяем, является ли текущий пользователь владельцем карточки
       }
@@ -36,7 +36,7 @@ module.exports.deleteCard = (req, res, next) => {
     .then(() => res.send({ message: 'Удалено' }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ErrorNotFound('Некорректные данные'));
+        next(new InvalidDataError('Некорректные данные'));
       } else {
         next(err);
       }
@@ -51,13 +51,13 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new InvalidDataError('Карточка не найдена');
+        throw new ErrorNotFound('Карточка не найдена');
       }
       res.send({ likes: card.likes });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ErrorNotFound('Некорректные данные'));
+        next(new InvalidDataError('Некорректные данные'));
       } else {
         next(err);
       }
@@ -72,13 +72,13 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new InvalidDataError('Карточка не найдена');
+        throw new ErrorNotFound('Карточка не найдена');
       }
       res.send({ likes: card.likes });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ErrorNotFound('Некорректные данные'));
+        next(new InvalidDataError('Некорректные данные'));
       } else {
         next(err);
       }
