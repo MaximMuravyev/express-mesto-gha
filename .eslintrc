@@ -9,6 +9,8 @@
         ]
       }
     ],
+    "linebreak-style": 0,
+    "no-console": 0,
     "object-shorthand": "off"
   }
 }

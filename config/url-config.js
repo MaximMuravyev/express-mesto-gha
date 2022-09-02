@@ -1,8 +1,8 @@
 const validator = require('validator');
 
-module.exports.urlValid = (url) => {
-  if (validator.isURL(url)) {
-    return url;
+module.exports.urlCorrect = (link) => {
+  if (validator.isURL(link)) {
+    return link;
   }
   throw new Error('Неправильный URL');
 };
