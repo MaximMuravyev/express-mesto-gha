@@ -4,13 +4,12 @@ const bcrypt = require('bcryptjs');
 const InvalidDataError = require('../errors/InvalidDataError');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const RequestError = require('../errors/RequestError');
-const AuthError = require('../errors/AuthError');
 const User = require('../models/users');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch(() => next({ message: 'Ошибка!' }));
+    .catch((err) => next(err));
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -25,7 +24,7 @@ module.exports.getUser = (req, res, next) => {
       } else if (err.message === 'Не найдено') {
         next(new ErrorNotFound('Некорректный id'));
       } else {
-        next({ message: 'Ошибка!' });
+        next(err);
       }
     });
 };
@@ -43,7 +42,7 @@ module.exports.getUserMe = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Ошибка!' });
+        next(err);
       }
     });
 };
@@ -65,7 +64,7 @@ module.exports.createUser = (req, res, next) => {
       } else if (err.code === 11000) {
         next(new RequestError('Данный email уже используется'));
       } else {
-        next({ message: 'Ошибка!' });
+        next(err);
       }
     });
 };
@@ -84,22 +83,14 @@ module.exports.login = (req, res, next) => {
         .status(200)
         .send({ message: 'Успешно!' });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new InvalidDataError('Некорректные данные'));
-      } else if (err.statusCode === 401) {
-        next(new AuthError('Некорректный пароль или email'));
-      } else {
-        next({ message: 'Ошибка!' });
-      }
-    });
+    .catch((err) => next(err));
 };
 
 module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
-    { name: name, about: about },
+    { name, about },
     { new: true, runValidators: true },
   )
     .then((user) => res.status(200).send(user))
@@ -107,7 +98,7 @@ module.exports.updateUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Ошибка!' });
+        next(err);
       }
     });
 };
@@ -116,7 +107,7 @@ module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
-    { avatar: avatar },
+    { avatar },
     { new: true, runValidators: true },
   )
     .then((user) => res.status(200).send(user))
@@ -124,7 +115,7 @@ module.exports.updateAvatar = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Ошибка!' });
+        next(err);
       }
     });
 };
