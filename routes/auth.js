@@ -14,7 +14,6 @@ router.post('/signin', celebrate({
       .email()
       .required(),
     password: Joi.string()
-      .min(8)
       .required(),
   }),
 }), login);
@@ -25,7 +24,6 @@ router.post('/signup', celebrate({
       .email()
       .required(),
     password: Joi.string()
-      .min(8)
       .required(),
     avatar: Joi.string()
       .custom(urlCorrect),
