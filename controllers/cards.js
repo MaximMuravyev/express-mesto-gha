@@ -6,7 +6,7 @@ const Cards = require('../models/card');
 module.exports.getCard = (req, res, next) => {
   Cards.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch(() => next({ message: 'Ошибка!' }));
+    .catch((err) => next(err));
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -18,7 +18,7 @@ module.exports.createCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Ошибка!' });
+        next(err);
       }
     });
 };
@@ -27,9 +27,9 @@ module.exports.deleteCard = (req, res, next) => {
   Cards.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        next(new ErrorNotFound('Не найдено'));
+        throw new ErrorNotFound('Не найдено');
       } else if (card.owner.toString() !== req.user._id) {
-        next(new ForbiddenError('Вы не можете это сделать'));
+        throw new ForbiddenError('Вы не можете это сделать');
       }
       return card.delete();
     })
@@ -38,7 +38,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Ошибка!' });
+        next(err);
       }
     });
 };
@@ -52,6 +52,7 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         next(new ErrorNotFound('Карточка не найдена'));
+        return;
       }
       res.status(200).send(card);
     })
@@ -59,7 +60,7 @@ module.exports.likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Ошибка!' });
+        next(err);
       }
     });
 };
@@ -77,7 +78,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new InvalidDataError('Некорректные данные'));
       } else {
-        next({ message: 'Ошибка!' });
+        next(err);
       }
     });
 };
